@@ -16,7 +16,6 @@ class Decrypter:
 
     def extract_variables_from_json(self, json_data):
         crypto = json_data['crypto']
-        print(crypto)
         cipher = crypto['cipher']
         self.ciphertext = crypto['ciphertext']
         self.iv = crypto['cipherparams']['iv']
@@ -42,6 +41,8 @@ class Decrypter:
         validate = dec_key[16:] + bytes.fromhex(self.ciphertext)
         keccak_hash = keccak.new(digest_bits=256)
         keccak_hash.update(validate)
+        if keccak_hash.hexdigest() != self.mac:
+            raise ValueError('Incorrect password')
 
     def decrypt_derived_key(self, dec_key):
         iv_int = int(self.iv, 16)
